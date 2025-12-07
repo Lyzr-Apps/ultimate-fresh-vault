@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "updated_at": "2025-12-07T12:00:00Z",
+  "workflow": {
+    "nodes": [
+      {
+        "id": "user_input",
+        "type": "input",
+        "label": "User Query",
+        "nodeCategory": "input",
+        "description": "User enters a message through chat interface",
+        "position": { "x": 100, "y": 200 }
+      },
+      {
+        "id": "chat_assistant_agent",
+        "type": "agent",
+        "label": "Chat Assistant Agent",
+        "nodeCategory": "agent",
+        "description": "Processes user queries with conversation context and generates responses",
+        "position": { "x": 500, "y": 200 }
+      },
+      {
+        "id": "response_output",
+        "type": "end",
+        "label": "Chat Response",
+        "nodeCategory": "end",
+        "description": "Display response in chat interface",
+        "position": { "x": 900, "y": 200 }
+      }
+    ],
+    "edges": [
+      { "source": "user_input", "target": "chat_assistant_agent", "label": "send message" },
+      { "source": "chat_assistant_agent", "target": "response_output", "label": "return response" }
+    ]
+  },
+  "agents": [
+    {
+      "agent_id": "6935f72d1f3e985c1e35fe6e",
+      "node_id": "chat_assistant_agent",
+      "name": "Chat Assistant Agent",
+      "description": "Conversational AI agent that responds to user queries, maintains context across messages, and provides helpful, accurate, and friendly responses on a wide range of topics",
+      "agent_role": "Conversational AI Assistant",
+      "agent_goal": "Provide helpful, accurate, and friendly responses to user queries while maintaining conversation context and ensuring a smooth, engaging chat experience",
+      "provider_id": "OpenAI",
+      "model": "gpt-4o",
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "features": ["MEMORY"],
+      "has_knowledge_base": false,
+      "rag_id": null,
+      "rag_name": null,
+      "position": { "x": 500, "y": 200 },
+      "created_at": "2025-12-07T12:00:00Z"
+    }
+  ],
+  "knowledge_bases": []
+}
