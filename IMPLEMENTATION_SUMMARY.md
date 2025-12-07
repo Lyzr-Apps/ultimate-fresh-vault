@@ -6,19 +6,33 @@ A complete Next.js-based conversational AI chatbot application that enables user
 ## Architecture
 
 ### Workflow Structure
-**Workflow Type:** Single Agent Pattern
+**Workflow Type:** Multi-Agent with Router Pattern
 - **Input Node:** User Query (chat message input)
-- **Processing Node:** Chat Assistant Agent (conversational AI)
-- **Output Node:** Chat Response (message display)
+- **Router Node:** Conditional routing to appropriate agent
+- **Processing Nodes:**
+  - Chat Assistant Agent (conversational AI)
+  - History Agent (conversation management)
+- **Output Node:** Response (message display)
 
-**Agent Configuration:**
-- **Agent ID:** `6935f72d1f3e985c1e35fe6e`
-- **Name:** Chat Assistant Agent
-- **Provider:** OpenAI
-- **Model:** gpt-4o
-- **Temperature:** 0.7 (balanced creativity and consistency)
-- **Top-P:** 0.95 (nucleus sampling for response diversity)
-- **Features:** Memory enabled (maintains conversation context up to 10 messages)
+**Primary Agents:**
+
+1. **Chat Assistant Agent**
+   - **Agent ID:** `6935f72d1f3e985c1e35fe6e`
+   - **Purpose:** General conversational AI
+   - **Provider:** OpenAI
+   - **Model:** gpt-4o
+   - **Temperature:** 0.7
+   - **Top-P:** 0.95
+   - **Features:** Memory enabled (10 message context)
+
+2. **History Agent**
+   - **Agent ID:** `6935f7d58691a38cc48c5738`
+   - **Purpose:** Conversation history management and analysis
+   - **Provider:** OpenAI
+   - **Model:** gpt-4o
+   - **Temperature:** 0.7
+   - **Top-P:** 0.95
+   - **Features:** Memory enabled (10 message context)
 
 ### System Architecture
 
@@ -37,15 +51,39 @@ OpenAI GPT-4o LLM
 ## Features Implemented
 
 ### Core Chat Features
+- **Dual Agent Modes:** Switch between Chat Assistant and History Agent via tabs
 - **Conversation Interface:** Clean, modern chat UI with message bubbles
 - **Message Types:** User messages (right-aligned, blue) and Assistant messages (left-aligned, gray)
 - **Auto-scrolling:** Chat automatically scrolls to the latest message
 - **Typing Indicator:** Loading state shows "Thinking..." with spinner
 - **Timestamps:** Each message displays time of send/receive
 
+### Chat Assistant Agent Features
+- **General Conversational AI:** Respond to wide range of user queries
+- **Context-Aware:** Maintains conversation context across messages
+- **Helpful Responses:** Provides accurate, friendly, and relevant answers
+- **Suggested Prompts:** 4 starter prompts to help users begin
+  - "What can you help me with today?"
+  - "Tell me about yourself"
+  - "How can I get the most out of this chat?"
+  - "What topics can we discuss?"
+
+### History Agent Features
+- **Conversation Summarization:** Create concise summaries of past conversations
+- **Key Topic Extraction:** Identify and highlight main topics discussed
+- **Important Points:** Retrieve specific information from conversation history
+- **Conversation Statistics:** Provide metrics about conversation length and scope
+- **Pattern Recognition:** Identify trends and action items from history
+- **Suggested Prompts:** 4 history-focused prompts
+  - "Summarize our conversation"
+  - "What were the key topics we discussed?"
+  - "Show me important points from our chat"
+  - "What action items came up?"
+
 ### User Experience
-- **Welcome Screen:** Greeting card with 4 suggested starter prompts
-- **Quick Start:** Users can click suggestions to populate input or type their own
+- **Agent Mode Tabs:** Visual tabs to switch between Chat and History modes
+- **Dynamic Welcome:** Welcome card content changes based on selected agent
+- **Dynamic Icons:** Icons change to reflect current agent mode
 - **Session Management:** Each new chat creates a unique session ID
 - **Input Handling:**
   - Send via button click
@@ -54,14 +92,15 @@ OpenAI GPT-4o LLM
   - Input disabled during response loading
 
 ### Smart Features
-- **Conversation Context:** Agent receives full conversation history for coherent responses
+- **Intelligent Routing:** System routes queries to appropriate agent
+- **Conversation Context:** Full conversation history sent to agents for coherence
 - **Multi-strategy JSON Parsing:** Bulletproof parsing of AI responses
   - Direct JSON.parse
   - Advanced parseLLMJson with automatic fixes
   - JSON extraction from mixed text
   - Last-resort aggressive parsing
 - **Error Handling:** Graceful error messages when API calls fail
-- **New Chat:** Button to reset conversation and start fresh
+- **New Chat Button:** Resets conversation, clears agent mode, starts fresh
 
 ## UI/UX Design
 

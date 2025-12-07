@@ -12,25 +12,44 @@
         "position": { "x": 100, "y": 200 }
       },
       {
+        "id": "router",
+        "type": "conditional",
+        "label": "Route Query",
+        "nodeCategory": "conditional",
+        "description": "Route to appropriate agent based on query type",
+        "position": { "x": 350, "y": 200 }
+      },
+      {
         "id": "chat_assistant_agent",
         "type": "agent",
         "label": "Chat Assistant Agent",
         "nodeCategory": "agent",
         "description": "Processes user queries with conversation context and generates responses",
-        "position": { "x": 500, "y": 200 }
+        "position": { "x": 600, "y": 100 }
+      },
+      {
+        "id": "history_agent",
+        "type": "agent",
+        "label": "History Agent",
+        "nodeCategory": "agent",
+        "description": "Manages conversation history, summaries, and retrieval",
+        "position": { "x": 600, "y": 300 }
       },
       {
         "id": "response_output",
         "type": "end",
-        "label": "Chat Response",
+        "label": "Response",
         "nodeCategory": "end",
-        "description": "Display response in chat interface",
+        "description": "Display response to user",
         "position": { "x": 900, "y": 200 }
       }
     ],
     "edges": [
-      { "source": "user_input", "target": "chat_assistant_agent", "label": "send message" },
-      { "source": "chat_assistant_agent", "target": "response_output", "label": "return response" }
+      { "source": "user_input", "target": "router", "label": "analyze query" },
+      { "source": "router", "target": "chat_assistant_agent", "label": "general chat" },
+      { "source": "router", "target": "history_agent", "label": "history/summary" },
+      { "source": "chat_assistant_agent", "target": "response_output", "label": "return response" },
+      { "source": "history_agent", "target": "response_output", "label": "return response" }
     ]
   },
   "agents": [
@@ -49,8 +68,26 @@
       "has_knowledge_base": false,
       "rag_id": null,
       "rag_name": null,
-      "position": { "x": 500, "y": 200 },
+      "position": { "x": 600, "y": 100 },
       "created_at": "2025-12-07T12:00:00Z"
+    },
+    {
+      "agent_id": "6935f7d58691a38cc48c5738",
+      "node_id": "history_agent",
+      "name": "History Agent",
+      "description": "Specialized agent that manages conversation history, provides summaries of past conversations, and helps users retrieve and analyze their chat records for better organization and context retrieval",
+      "agent_role": "Conversation History Manager",
+      "agent_goal": "Efficiently manage, summarize, and retrieve conversation history to help users understand and organize their past interactions",
+      "provider_id": "OpenAI",
+      "model": "gpt-4o",
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "features": ["MEMORY"],
+      "has_knowledge_base": false,
+      "rag_id": null,
+      "rag_name": null,
+      "position": { "x": 600, "y": 300 },
+      "created_at": "2025-12-07T12:05:00Z"
     }
   ],
   "knowledge_bases": []

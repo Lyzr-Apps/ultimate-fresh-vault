@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { Send, Plus } from 'lucide-react'
+import { Send, Plus, MessageCircle, Clock } from 'lucide-react'
 
 interface Message {
   id: string
@@ -21,13 +21,24 @@ const SUGGESTED_PROMPTS = [
   'What topics can we discuss?'
 ]
 
-const AGENT_ID = '6935f72d1f3e985c1e35fe6e'
+const HISTORY_PROMPTS = [
+  'Summarize our conversation',
+  'What were the key topics we discussed?',
+  'Show me important points from our chat',
+  'What action items came up?'
+]
+
+const CHAT_AGENT_ID = '6935f72d1f3e985c1e35fe6e'
+const HISTORY_AGENT_ID = '6935f7d58691a38cc48c5738'
+
+type AgentMode = 'chat' | 'history'
 
 export default function HomePage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [sessionId, setSessionId] = useState<string>('')
+  const [agentMode, setAgentMode] = useState<AgentMode>('chat')
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -67,12 +78,14 @@ export default function HomePage() {
         ? `${conversationHistory}\nUser: ${messageText}`
         : messageText
 
+      const selectedAgentId = agentMode === 'chat' ? CHAT_AGENT_ID : HISTORY_AGENT_ID
+
       const response = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: fullMessage,
-          agent_id: AGENT_ID,
+          agent_id: selectedAgentId,
           session_id: sessionId,
           user_id: 'chat-user'
         })
@@ -110,6 +123,7 @@ export default function HomePage() {
   const handleNewChat = () => {
     setMessages([])
     setInput('')
+    setAgentMode('chat')
     setSessionId(Math.random().toString(36).substring(2, 11))
   }
 
@@ -120,21 +134,49 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">K</span>
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">K</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Knowledge Assistant</h1>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Knowledge Assistant</h1>
+          <Button
+            onClick={handleNewChat}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Plus size={18} />
+            New Chat
+          </Button>
         </div>
-        <Button
-          onClick={handleNewChat}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <Plus size={18} />
-          New Chat
-        </Button>
+
+        {/* Agent Mode Tabs */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setAgentMode('chat')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              agentMode === 'chat'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <MessageCircle size={18} />
+            Chat
+          </button>
+          <button
+            onClick={() => setAgentMode('history')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              agentMode === 'history'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Clock size={18} />
+            History
+          </button>
+        </div>
       </header>
 
       {/* Chat Container */}
@@ -147,13 +189,21 @@ export default function HomePage() {
             <Card className="max-w-2xl w-full p-8 text-center border-gray-200">
               <div className="mb-8">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <span className="text-white font-bold text-3xl">K</span>
+                  {agentMode === 'chat' ? (
+                    <MessageCircle size={32} className="text-white" />
+                  ) : (
+                    <Clock size={32} className="text-white" />
+                  )}
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Hi! How can I help you today?
+                  {agentMode === 'chat'
+                    ? 'Hi! How can I help you today?'
+                    : 'Explore Your Conversation History'}
                 </h2>
                 <p className="text-gray-600 mb-8">
-                  Ask me anything and I'll do my best to help with accurate, helpful responses.
+                  {agentMode === 'chat'
+                    ? 'Ask me anything and I\'ll do my best to help with accurate, helpful responses.'
+                    : 'Get summaries, key topics, and insights from your conversations.'}
                 </p>
               </div>
 
@@ -162,7 +212,7 @@ export default function HomePage() {
                   Suggested prompts to get started:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {SUGGESTED_PROMPTS.map((prompt, index) => (
+                  {(agentMode === 'chat' ? SUGGESTED_PROMPTS : HISTORY_PROMPTS).map((prompt, index) => (
                     <button
                       key={index}
                       onClick={() => handleSuggestionClick(prompt)}
